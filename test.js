@@ -203,6 +203,33 @@ test('should catch a query thats too deep', t => {
   t.deepEqual("'' exceeds maximum operation depth of 4", errors[0].message)
 })
 
+test('should catch a query thats too deep on specific field only', t => {
+  const query = `{
+    user {
+      pets {
+        owner {
+          pets {
+            owner {
+              pets {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
+  t.plan(2)
+  const document = createDocument(query)
+  const errors = validate(schema, document, [ ...specifiedRules, depthLimit(1, {
+    specificField: [{
+      user: 4 
+    }]
+  }) ])
+  t.is(1, errors.length)
+  t.deepEqual("'' exceeds maximum operation depth of 4", errors[0].message)
+})
+
 test('should ignore a field', t => {
   const query = `
     query read1 {

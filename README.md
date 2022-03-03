@@ -185,12 +185,19 @@ app.use('/graphql', graphqlHTTP((req, res) => ({
 
 The first argument is the total depth limit. This will throw a validation error for queries (or mutations) with a depth of 11 or more.<br/>
 The second argument is an options object, where you can do things like specify ignored fields. Introspection fields are ignored by default.<br/>
-The third argument is a callback which receives an `Object` which is a map of the depths for each operation.<br/>
+The third argument is an options object, where you can override maximum depth limit on specific field.<br/>
+The fourth argument is a callback which receives an `Object` which is a map of the depths for each operation.<br/>
 
 ```js
 depthLimit(
   10,
-  { ignore: [ /_trusted$/, 'idontcare' ] },
+  { 
+    ignore: [ /_trusted$/, 'idontcare' ],
+    specificField: [
+      {'whatever': 5}
+      {'orOtherField': 1}
+    ]
+  },
   depths => console.log(depths)
 )
 ```
@@ -231,5 +238,6 @@ Creates a validator for the GraphQL query depth
 | maxDepth | <code>Number</code> | The maximum allowed depth for any operation in a GraphQL document. |
 | [options] | <code>Object</code> |  |
 | options.ignore | <code>Array.&lt;(String\|RegExp\|function())&gt;</code> | Stops recursive depth checking based on a field name. Either a string or regexp to match the name, or a function that reaturns a boolean. |
+| options.specificField | <code>Array.&lt;(Object)&gt;</code> | Replace maximum depth on specific field name. |
 | [callback] | <code>function</code> | Called each time validation runs. Receives an Object which is a map of the depths for each operation. |
 
